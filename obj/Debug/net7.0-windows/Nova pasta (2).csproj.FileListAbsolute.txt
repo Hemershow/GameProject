@@ -1,0 +1,15 @@
+C:\Users\disrct\Desktop\Nova pasta (2)\bin\Debug\net7.0-windows\Nova pasta (2).exe
+C:\Users\disrct\Desktop\Nova pasta (2)\bin\Debug\net7.0-windows\Nova pasta (2).deps.json
+C:\Users\disrct\Desktop\Nova pasta (2)\bin\Debug\net7.0-windows\Nova pasta (2).runtimeconfig.json
+C:\Users\disrct\Desktop\Nova pasta (2)\bin\Debug\net7.0-windows\Nova pasta (2).dll
+C:\Users\disrct\Desktop\Nova pasta (2)\bin\Debug\net7.0-windows\Nova pasta (2).pdb
+C:\Users\disrct\Desktop\Nova pasta (2)\obj\Debug\net7.0-windows\Nova pasta (2).csproj.AssemblyReference.cache
+C:\Users\disrct\Desktop\Nova pasta (2)\obj\Debug\net7.0-windows\Nova pasta (2).GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\disrct\Desktop\Nova pasta (2)\obj\Debug\net7.0-windows\Nova pasta (2).AssemblyInfoInputs.cache
+C:\Users\disrct\Desktop\Nova pasta (2)\obj\Debug\net7.0-windows\Nova pasta (2).AssemblyInfo.cs
+C:\Users\disrct\Desktop\Nova pasta (2)\obj\Debug\net7.0-windows\Nova pasta (2).csproj.CoreCompileInputs.cache
+C:\Users\disrct\Desktop\Nova pasta (2)\obj\Debug\net7.0-windows\Nova pasta (2).dll
+C:\Users\disrct\Desktop\Nova pasta (2)\obj\Debug\net7.0-windows\refint\Nova pasta (2).dll
+C:\Users\disrct\Desktop\Nova pasta (2)\obj\Debug\net7.0-windows\Nova pasta (2).pdb
+C:\Users\disrct\Desktop\Nova pasta (2)\obj\Debug\net7.0-windows\Nova pasta (2).genruntimeconfig.cache
+C:\Users\disrct\Desktop\Nova pasta (2)\obj\Debug\net7.0-windows\ref\Nova pasta (2).dll
