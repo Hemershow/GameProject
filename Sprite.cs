@@ -22,3 +22,27 @@ public class PlayerSprite : Sprite
         this.spriteH = this.image.Height/this.rows;
     }
 }
+
+public class Map : Sprite
+{
+    public Map()
+    {
+        this.image = new Bitmap(new Bitmap("./sprites/map.png"), 5760, 11520);
+        this.columns = 1;
+        this.rows = 1;
+        this.spriteW = this.image.Width/this.columns;
+        this.spriteH = this.image.Height/this.rows;
+    }
+}
+
+public class Monitor : Sprite
+{
+    public Monitor()
+    {
+        this.image = new Bitmap(new Bitmap("./sprites/monitor.png"), 1925, 1085);
+        this.columns = 1;
+        this.rows = 1;
+        this.spriteW = this.image.Width/this.columns;
+        this.spriteH = this.image.Height/this.rows;
+    }
+}

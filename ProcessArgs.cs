@@ -6,6 +6,11 @@ public class ProcessArgs
 
 public class PlayerArgs : ProcessArgs
 {
+    public PlayerArgs(int x, int y)
+    {
+        this.x = x;
+        this.y = y;
+    }
     public int x { get; set;} = 0;
     public int y { get; set;} = 0;
 }

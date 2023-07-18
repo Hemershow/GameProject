@@ -38,7 +38,7 @@ public class Game
 
         public GameBuilder SetArgs()
         {
-            this.game.playerArgs = new PlayerArgs();
+            this.game.playerArgs = new PlayerArgs(980, 980);
             this.game.screenArgs = new ScreenArgs();
             return this;
         }
