@@ -1,39 +1,37 @@
 using System.Collections.Generic;
+using System.Windows.Forms;
 
 public abstract class Player
 {
     public int x { get; set;}
     public int y { get; set;}
-    public bool moveRight { get; set; } = false;
-    public bool moveLeft {get; set; } = false; 
-    public bool moveDown { get; set; } = false;
-    public bool moveUp { get; set; } = false;
-    public bool running {get; set; } = false;
     private int xMovement { get; set; } = 0;
     private int yMovement { get; set; } = 0;
     private int baseSpeed { get; set; } = 50;
     public void Move(int xLimit, int yLimit, int charW, int charH)
     {
-        if (this.moveLeft && this.moveRight)
-            this.xMovement = 0;
-        else if (this.moveRight) 
-            this.xMovement = this.baseSpeed + (this.running ? this.baseSpeed : 0);
-        else if (this.moveLeft)
-            this.xMovement = -(this.baseSpeed + (this.running ? this.baseSpeed : 0));
+        var keyMap = Game.Current.keymap.keyMapping;
 
-        if (this.moveDown && this.moveUp)
+        if (keyMap[Keys.Left] && keyMap[Keys.Right])
+            this.xMovement = 0;
+        else if (keyMap[Keys.Right]) 
+            this.xMovement = this.baseSpeed + (keyMap[Keys.ShiftKey] ? this.baseSpeed : 0);
+        else if (keyMap[Keys.Left])
+            this.xMovement = -(this.baseSpeed + (keyMap[Keys.ShiftKey] ? this.baseSpeed : 0));
+
+        if (keyMap[Keys.Down] && keyMap[Keys.Up])
             this.yMovement = 0;
-        else if (this.moveDown)
-            this.yMovement = this.baseSpeed + (this.running ? this.baseSpeed : 0);
-        else if (this.moveUp)
-            this.yMovement = -(this.baseSpeed + (this.running ? this.baseSpeed : 0));
+        else if (keyMap[Keys.Down])
+            this.yMovement = this.baseSpeed + (keyMap[Keys.ShiftKey] ? this.baseSpeed : 0);
+        else if (keyMap[Keys.Up])
+            this.yMovement = -(this.baseSpeed + (keyMap[Keys.ShiftKey] ? this.baseSpeed : 0));
 
         if (!(this.x + xMovement < charW/2))
-            if (!(this.x + xMovement > xLimit - charW/2))
+            if (!(this.x + xMovement > xLimit - charW))
                 this.x += xMovement;
     
         if (!(this.y + yMovement < charH/2))
-            if (!(this.y + yMovement > yLimit - charH/2))
+            if (!(this.y + yMovement > yLimit - charH))
                 this.y += yMovement;
 
         this.xMovement = 0;

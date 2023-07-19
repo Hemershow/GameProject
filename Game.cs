@@ -8,7 +8,9 @@ public class Game
     private static Game crr = null;
     public static Game Current => crr;
     public Player player = null; 
+    public Enemies enemies = new Enemies();
     public Screen screen = null; 
+    public KeyMap keymap = null;
     public PlayerArgs playerArgs = null;
     public ScreenArgs screenArgs = null;
     public void Run()
@@ -33,6 +35,13 @@ public class Game
             where T : Screen
         {
             this.game.screen = (Screen)Activator.CreateInstance(typeof(T), new object[] {this.game.screenArgs});
+            return this;
+        }
+
+        public GameBuilder SetKeyMapping<T>()
+            where T : KeyMap
+        {
+            this.game.keymap = (T)Activator.CreateInstance<T>();
             return this;
         }
 
