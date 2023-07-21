@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 public abstract class Screen
@@ -10,6 +11,7 @@ public abstract class Screen
     public Timer timer { get; set; }
     public int interval { get; set; }
     public DateTime latestChange { get; set; }
+    public Sprite map { get; set; } = new MapSprite();
     public DateTime now { get; set;} = DateTime.Now;
 
     public void Start()
@@ -28,10 +30,9 @@ public abstract class Screen
 
         this.timer.Tick += delegate
         {
-            this.SetDirection();
             this.now = DateTime.Now;
 
-            if ((now - this.latestChange).Milliseconds >= 20)
+            if ((now - this.latestChange).TotalMilliseconds >= 20)
             {
                 this.MovePlayer();   
                 this.MoveEnemies();
@@ -51,7 +52,6 @@ public abstract class Screen
     protected abstract void LoadForm();
     protected abstract void LoadSprites(DateTime now);
     protected abstract void MovePlayer();
-    protected abstract void SetDirection();
     protected abstract void MoveEnemies();
 }
 
@@ -59,60 +59,40 @@ public class SpriteScreen : Screen
 {
     public Graphics g { get; set; } = null;
     public Bitmap bmp { get; set; }
-    public AnimatedSprite player { get; set; } = new PurplePlayerSprite();
     public Sprite monitor { get; set; } = new MonitorSprite();
-    public Sprite map { get; set; } = new MapSprite();
-    public AnimatedSprite glitch { get; set; } = new GlitchSprite();
-    public int glitchColumn { get; set; } = 0;
-    public int glitchRow { get; set; } = 0;
-    public DateTime glitchLatestChange { get; set; } = DateTime.Now;
+    public BrainSprite brain { get; set; } = new BrainSprite();
+    public ButtonXSprite xBtn { get; set; } = new ButtonXSprite();
     public PictureBox pb { get; set; } = null;
-    public int character { get; set; } = 0;
     public Queue<DateTime> queue { get; set; } = new Queue<DateTime>();
-    public Random rnd { get; set; }= new Random();
-    public int direction { get; set; } 
     public int mapX { get; set; }
     public int mapY { get; set; }
     public int spriteX { get; set; }
     public int spriteY { get; set; }
+    public int tempEnemyX { get; set; }
+    public int tempEnemyY { get; set; }
+    public int tempBtnX { get; set; } = 0;
+    public int tempBtnY { get; set; } = 0;
     public DateTime latestSpriteChange { get; set; } = DateTime.Now;
+    public int timeAtIfs { get; set; }
+    public int totalTimeMap { get; set; }
+    public int imageSizeX { get; set; }
+    public int imageSizeY { get; set; }
     public SpriteScreen(ScreenArgs args)
     {
         this.interval = args.interval;
-    }
-    protected override void SetDirection()
-    {
-        var keyMap = Game.Current.keymap.keyMapping;
-        if (
-            !(keyMap[Keys.Down] || 
-            keyMap[Keys.Up] ||
-            keyMap[Keys.Left] ||
-            keyMap[Keys.Right])
-        )
-            this.direction = this.player.idle;
-        else if (keyMap[Keys.Right])
-            this.direction = this.player.right;
-        else if (keyMap[Keys.Left])
-            this.direction = this.player.left;
-        else if (keyMap[Keys.Down])
-            this.direction = this.player.down;
-        else if (keyMap[Keys.Up])
-            this.direction = this.player.up;
-
     }
     protected override void LoadForm()
     {
         this.pb = new PictureBox();
         pb.Dock = DockStyle.Fill;
         this.forms.Controls.Add(pb);
-        this.direction = this.player.idle;
         this.bmp = new Bitmap(this.pb.Width, this.pb.Height);
         this.queue.Enqueue(DateTime.Now);
         this.g = Graphics.FromImage(bmp);
         this.g.Clear(Color.Black);
         this.pb.Image = bmp;
         this.timer.Start();
-        Game.Current.enemies.SpawnGlitchs(3, this.map.spriteW, this.map.spriteH, this.player.spriteW, this.player.spriteH);
+        Game.Current.SpawnGlitchs(Game.Current.startingGlitchs, this.map.spriteW, this.map.spriteH, Game.Current.player.playerSprite.spriteW, Game.Current.player.playerSprite.spriteH);
     }
 
     protected override void MovePlayer()
@@ -120,78 +100,198 @@ public class SpriteScreen : Screen
         Game.Current.player.Move(
             this.map.spriteW, 
             this.map.spriteH,
-            this.player.spriteW,
-            this.player.spriteH
+            Game.Current.player.playerSprite.spriteW,
+            Game.Current.player.playerSprite.spriteH
         );
         this.latestChange = DateTime.Now;
     }
 
     protected override void MoveEnemies()
     {
+        var glitches = Game.Current.glitches;
 
+        // for (int i = 0; i < glitches.Count; i++)
+        // {
+        //     for (int j = 0; j < glitches[i].bugs.Count; j++)
+        //     {
+        //         glitches[i].bugs[j].Move(this.now);
+        //         glitches[i].bugs[j].Atack(this.now);
+        //     }
+        //     glitches[i].Move(this.now);
+        //     glitches[i].Atack(this.now);
+        // }
+
+        Parallel.For(0, glitches.Count, i => 
+        {
+            Parallel.For(0, glitches[i].bugs.Count, j => 
+            {
+                glitches[i].bugs[j].Move(this.now);
+                glitches[i].bugs[j].Atack(this.now);
+            });
+
+            glitches[i].Move(this.now);
+            glitches[i].Atack(this.now);
+        });
     }
 
     protected override void LoadSprites(DateTime now)
     {  
         this.g.Clear(Color.Black);
+        Game.Current.player.playerSprite.UpdateSprites();
+
         this.DrawMap();
         this.DrawEnemies();
-        this.DrawPlayer(now, this.latestSpriteChange);
+        this.DrawPlayer();
+        this.DrawStatus();
         this.DrawMonitor();
         this.DrawInfo(now);
+
         this.pb.Refresh();
+    }
+
+    private void DrawStatus()
+    {
+        this.brain.UpdateSprites(this.now);
+
+        this.g.DrawImage(
+            brain.image,
+            100,
+            900,
+            new Rectangle(brain.spriteW * brain.currentColumn, brain.spriteH * brain.currentRow, brain.spriteW, brain.spriteH),
+            GraphicsUnit.Pixel
+        );
+
+        this.g.DrawString(
+            (Game.Current.player.stress.ToString() + "%"),
+            new Font("Arial", 25),
+            new SolidBrush(Color.White),
+            190,
+            915,
+            new StringFormat()
+        );
     }
 
     private void DrawEnemies()
     {
-        if ((this.now - this.glitchLatestChange).Milliseconds > this.glitch.animationLenght)
+        for (int i = 0; i < Game.Current.glitches.Count; i++)
         {
-            if (this.glitchColumn == 3)
-            {
-                this.glitchColumn = 0;
-                this.glitchRow++;
-            }
-            if (this.glitchRow == 3)
-            {
-                this.glitchRow = 0;
-                this.glitchColumn = 0;
-            }
-            this.glitchColumn++;
-        }
+            var glitch = Game.Current.glitches[i];
 
-        foreach (var item in Game.Current.enemies.enemiesList.Select(x => x).Where(x => x.range == -1))
+            for (int j = 0; j < glitch.bugs.Count; j++)
+                this.DrawEnemy(glitch.bugs[j]);
+
+            if (Game.Current.player.InReachOfEnemy(glitch))
+                this.DrawButton(glitch);
+
+            if (glitch.inMinigame)
+            {
+                this.DrawMinigame(glitch);
+                glitch.Debug(this.now);
+            }
+
+            this.DrawEnemy(glitch);
+
+            this.tempEnemyX = glitch.x;
+            this.tempEnemyY = glitch.y;
+        }
+    }
+
+    private void DrawMinigame(Enemy enemy)
+    {
+        this.g.DrawImage
+        (
+            enemy.miniGame.structure.image,
+            enemy.miniGame.x,
+            enemy.miniGame.y,
+            new Rectangle(0, 0, enemy.miniGame.structure.spriteW, enemy.miniGame.structure.spriteH),
+            GraphicsUnit.Pixel
+        );
+
+        foreach (var componenet in enemy.miniGame.components)
         {
             this.g.DrawImage
             (
-                this.glitch.image,
-                this.mapX + item.x,
-                this.mapY + item.y,
-                new Rectangle(
-                    this.glitch.spriteW * this.glitchColumn,
-                    this.glitch.spriteH * this.glitchRow,
-                    this.glitch.spriteW,
-                    this.glitch.spriteH
-                ),
+                componenet.image,
+                componenet.x,
+                componenet.y,
+                new Rectangle(0, 0, componenet.spriteW, componenet.spriteH),
                 GraphicsUnit.Pixel
             );
         }
     }
 
+    private void DrawButton(Enemy enemy)
+    {
+        this.g.DrawImage
+        (
+            this.xBtn.image,
+            enemy.x + enemy.enemySprite.spriteW/2 - this.xBtn.spriteW/2 - this.mapX,
+            enemy.y - enemy.enemySprite.spriteH * 3 - this.mapY,
+            new Rectangle(
+                0,
+                0,
+                this.xBtn.spriteW,
+                this.xBtn.spriteH
+            ),
+            GraphicsUnit.Pixel
+        );
+        this.tempBtnX = enemy.x + enemy.enemySprite.spriteW/2 - this.xBtn.spriteW/2;
+        this.tempBtnY = enemy.y - enemy.enemySprite.spriteH/2;
+    }
+
+    private void DrawEnemy(Enemy enemy)
+    {
+        enemy.enemySprite.UpdateSprites(this.now);
+
+        if (
+            enemy.x - mapX > -enemy.enemySprite.spriteW && 
+            enemy.x - mapX < (this.mapX + this.map.spriteW) + enemy.enemySprite.spriteW &&
+            enemy.y - mapY > -enemy.enemySprite.spriteW &&
+            enemy.y - mapY < (this.mapY + this.map.spriteH) + enemy.enemySprite.spriteH
+        )
+            this.g.DrawImage
+            (
+                enemy.enemySprite.image,
+                enemy.x - this.mapX,
+                enemy.y - this.mapY,
+                new Rectangle(
+                    enemy.enemySprite.spriteW * enemy.enemySprite.currentColumn,
+                    enemy.enemySprite.spriteH * enemy.enemySprite.currentRow,
+                    enemy.enemySprite.spriteW,
+                    enemy.enemySprite.spriteH
+                ),
+                // new Rectangle(
+                //     enemy.enemySprite.spriteW * enemy.enemySprite.currentColumn,
+                //     enemy.enemySprite.spriteH * enemy.enemySprite.currentRow,
+                //     enemy.enemySprite.spriteW * enemy.enemySprite.currentColumn + enemy.enemySprite.spriteW,
+                //     enemy.enemySprite.spriteH * enemy.enemySprite.currentRow + enemy.enemySprite.spriteH
+                // ),
+                GraphicsUnit.Pixel
+            );
+    }
+
     private void DrawMap()
     {
-        int xPosition = Game.Current.player.x - 960 + this.player.spriteW/2;
-        int yPosition = Game.Current.player.y - 540 + this.player.spriteH/2;
+        var startingTime = DateTime.Now;
+        var player = Game.Current.player;
 
-        if (Game.Current.player.x < 960 - this.player.spriteW/2)
-            xPosition = 0;
-        else if (Game.Current.player.x > this.map.spriteW - 960)
-            xPosition = this.map.spriteW - 1920 + this.player.spriteW/2;
+        int xPosition = player.x - 960 + player.playerSprite.spriteW/2;
+        int yPosition = player.y - 540 + player.playerSprite.spriteH/2;
 
-        if (Game.Current.player.y < 540 - this.player.spriteH/2)
-            yPosition = 0;
-        else if (Game.Current.player.y > this.map.spriteH - 540)
-            yPosition = this.map.spriteH - 1080 + this.player.spriteH/2;
+        var secondTime = DateTime.Now;
         
+        if (player.x < 960 - player.playerSprite.spriteW/2)
+            xPosition = 0;
+        else if (player.x > this.map.spriteW - 960)
+            xPosition = this.map.spriteW - 1920 + player.playerSprite.spriteW/2;
+
+        if (player.y < 540 - player.playerSprite.spriteH/2)
+            yPosition = 0;
+        else if (player.y > this.map.spriteH - 540)
+            yPosition = this.map.spriteH - 1080 + player.playerSprite.spriteH/2;
+        
+        this.timeAtIfs = (int)(DateTime.Now - secondTime).TotalMilliseconds;
+
         this.g.DrawImage(
             this.map.image,
             0,
@@ -205,59 +305,43 @@ public class SpriteScreen : Screen
             GraphicsUnit.Pixel
         );
 
+        this.totalTimeMap = (int)((DateTime.Now - startingTime).TotalMilliseconds);
         this.mapX = xPosition;
         this.mapY = yPosition;
     }
 
-    private void DrawPlayer(DateTime now, DateTime latestChange)
+    private void DrawPlayer()
     {
-        int xPosition = 960 - (this.player.spriteW / 2), 
-            yPosition = 540 - (this.player.spriteH / 2); 
+        Game.Current.player.playerSprite.UpdateSprites(this.now);
+        var player = Game.Current.player;
 
-        if (Game.Current.player.x < xPosition || Game.Current.player.x > this.map.spriteW - xPosition - this.player.spriteW/2)
-            xPosition = Game.Current.player.x - this.mapX;
+        int xPosition = 960 - (player.playerSprite.spriteW / 2), 
+            yPosition = 540 - (player.playerSprite.spriteH / 2); 
 
-        if (Game.Current.player.y < yPosition || Game.Current.player.y > this.map.spriteH - yPosition - this.player.spriteH/2)
-            yPosition = Game.Current.player.y - this.mapY;
+        if (player.x < xPosition || player.x > this.map.spriteW - xPosition - player.playerSprite.spriteW/2)
+            xPosition = player.x - this.mapX;
 
-        if (this.character >= this.player.columns)
-            this.character = 0;
+        if (player.y < yPosition || player.y > this.map.spriteH - yPosition - player.playerSprite.spriteH/2)
+            yPosition = player.y - this.mapY;
 
         this.g.DrawImage(
-            this.player.image, 
+            player.playerSprite.image, 
             xPosition, 
             yPosition, 
             new Rectangle(
-                this.player.spriteW * this.character, 
-                this.player.spriteH * this.direction, 
-                this.player.spriteW, this.player.spriteH
+                player.playerSprite.spriteW * player.playerSprite.currentColumn, 
+                player.playerSprite.spriteH * player.playerSprite.currentRow, 
+                player.playerSprite.spriteW, 
+                player.playerSprite.spriteH
             ), 
             GraphicsUnit.Pixel
         );        
-
-        if ((now - latestChange).Milliseconds >= this.player.animationLenght/this.player.columns)
-        {
-            this.character++;
-            this.latestSpriteChange = DateTime.Now;
-        }
 
         this.spriteX = xPosition;
         this.spriteY = yPosition;
     }
 
     private void DrawMonitor()
-    {
-        this.g.DrawImage
-        (
-            this.monitor.image,
-            0,
-            0,
-            new Rectangle(0, 0, this.monitor.spriteW, this.monitor.spriteH),
-            GraphicsUnit.Pixel
-        );
-    }
-
-    private void DrawGlitch()
     {
         this.g.DrawImage
         (
@@ -282,14 +366,16 @@ public class SpriteScreen : Screen
         }
         
         string info = "----- FPS: " + fps.ToString() + 
-            "----- playerX: " + 
-            Game.Current.player.x + 
-            "----- playerY: " + 
-            Game.Current.player.y +
+            // "----- playerX: " + Game.Current.player.x + 
+            // "----- playerY: " + Game.Current.player.y +
             "---- mapX: " + this.mapX.ToString() +
             "----- mapY:" + this.mapY.ToString() +
-            "----- spriteX: " + this.spriteX.ToString() +
-            "----- spriteY: " + this.spriteY.ToString();
+            // "----- spriteX: " + this.spriteX.ToString() +
+            // "----- spriteY: " + this.spriteY.ToString() +
+            // "----- enemyX: " + this.tempEnemyX.ToString() +
+            // "----- enemyY: " + this.tempEnemyY.ToString() +
+            "--------- ifs: " + this.timeAtIfs.ToString() + 
+            "----- mapTime: " + this.totalTimeMap.ToString();
 
         this.g.DrawString(
             info,

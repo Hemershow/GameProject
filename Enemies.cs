@@ -1,28 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-public class Enemies
-{
-    public Random rnd = new Random();
-    public List<Enemy> enemiesList = new List<Enemy>();
-    public void SpawnGlitchs(int amount, int xLimit, int yLimit, int charW, int charH)
-    {
-        for (int i = 0; i < amount; i++)
-        {   
-            var bug = new Bug(
-                rnd.Next(0 + charW, xLimit - charW), 
-                rnd.Next(0 + charH, yLimit - charH)
-            );
-
-            enemiesList.Add(bug);
-        }
-    }
-}
-
 public abstract class Enemy
 {
+    public MiniGame miniGame { get; set; }
+    public AnimatedSprite enemySprite { get; set; }
+    public Random rnd { get; set; }
     public bool atack { get; set; }
     public int x { get; set; }
     public int y { get; set; }
@@ -30,14 +16,38 @@ public abstract class Enemy
     public int speed { get; set; }
     public int atackSpeed { get; set; }
     public int range { get; set; }
-    public abstract void Move();
-    public abstract void Atack();
+    public DateTime latestUpdate { get; set; } = DateTime.Now;
+    public DateTime latestAtack { get; set; }
+    public abstract void Move(DateTime now);
+    public abstract void Atack(DateTime now);
+    public virtual bool InRange()
+    {
+        if (
+            Game.Current.player.x + this.enemySprite.spriteW + this.range < this.x &&
+            Game.Current.player.x - this.range > this.x
+        )
+            if (
+                Game.Current.player.y + this.enemySprite.spriteH + this.range < this.y &&
+                Game.Current.player.y - this.range > this.y
+            )
+                return true;
+        return false;
+    }
+
+    public virtual void Debug(DateTime now) {}
+    public virtual void Stop() => 
+        this.atack = false;
 }
 
 public class Glitch : Enemy
 {
+    public bool inMinigame { get; set; } = false;
+    public List<Enemy> bugs { get; set; } = new List<Enemy>();
     public Glitch(int x, int y)
     {
+        this.miniGame = new Reaction();
+        this.latestAtack = DateTime.Now;
+        this.enemySprite = new GlitchSprite();
         this.damage = 0;
         this.atackSpeed = 5000;
         this.range = -1;
@@ -46,21 +56,60 @@ public class Glitch : Enemy
         this.y = y;
     }
 
-    public override void Move() {}
-    public override void Atack() 
+    public override void Move(DateTime now) {}
+    public override void Atack(DateTime now) 
     {
-        Game.Current.enemies.enemiesList.Add(new Bug(this.x, this.y));
+        if ((now - this.latestAtack).TotalMilliseconds > this.atackSpeed)
+        {
+            this.bugs.Add(new Bug(this.x, this.y));
+            this.latestAtack = DateTime.Now;
+        }
     }
-    public void Stop()
+
+    public override void Debug(DateTime now)
     {
-        this.atack = false;
+        this.miniGame.CheckInteraction();
+        this.miniGame.Run(now);
+
+        if (this.miniGame.finished)
+        {
+            this.atack = true;
+        
+            inMinigame = false;
+        
+            Game.Current.player.canMove = true;
+            Game.Current.SpawnGlitchs(
+                3, 
+                Game.Current.screen.map.spriteW, 
+                Game.Current.screen.map.spriteH, 
+                Game.Current.player.playerSprite.spriteW, 
+                Game.Current.player.playerSprite.spriteH
+            );
+        
+            foreach (var glitch in Game.Current.glitches)
+            {
+                foreach (var bug in glitch.bugs)
+                    bug.atack = !this.miniGame.success;
+            }
+
+            if (this.miniGame.success)
+                Game.Current.glitches.RemoveAll(x => (x.x == this.x && x.y == this.y));
+            
+            this.miniGame = new Reaction();
+        }
+        else 
+            inMinigame = true;
     }
 }
 
 public class Bug : Enemy
 {
+    public int xObjective { get; set; } = -1;
+    public int yObjective { get; set; } = -1;
     public Bug(int x, int y)
     {
+        this.enemySprite = new BugSprite();
+        this.rnd = new Random();
         this.damage = 10;
         this.speed = 10;
         this.atackSpeed = 1000;
@@ -68,9 +117,11 @@ public class Bug : Enemy
         this.x = x;
         this.y = y;
         this.atack = false;
+        this.xObjective = this.rnd.Next(0, Game.Current.screen.map.spriteW);
+        this.yObjective = this.yObjective = this.rnd.Next(0, Game.Current.screen.map.spriteH);
     }
 
-    public override void Move() 
+    public override void Move(DateTime now) 
     {
         if (this.atack)
         {
@@ -81,11 +132,28 @@ public class Bug : Enemy
         }
         else
         {
-            
+            if (
+                this.xObjective - this.speed >= this.x && 
+                this.xObjective + this.speed <= this.x
+            )
+                this.xObjective = this.rnd.Next(this.x - 540, this.x + 540);
+            else 
+                this.x += this.xObjective > this.x ? this.speed : -this.speed;
+
+            if (
+                this.yObjective - this.speed >= this.y && 
+                this.yObjective + this.speed <= this.y
+            )
+                this.yObjective = this.rnd.Next(this.y - 960, this.y + 960);
+            else
+                this.y += this.yObjective > this.y ? this.speed : -this.speed;
         }
     }
-    public override void Atack()
+    public override void Atack(DateTime now)
     {
-        
+        // if (this.atack)
+        // {
+        //     if ()
+        // }
     }
 }

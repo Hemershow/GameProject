@@ -8,14 +8,28 @@ public class Game
     private static Game crr = null;
     public static Game Current => crr;
     public Player player = null; 
-    public Enemies enemies = new Enemies();
+    public Random rnd { get; set; } = new Random();
+    public List<Glitch> glitches = new List<Glitch>();
     public Screen screen = null; 
     public KeyMap keymap = null;
     public PlayerArgs playerArgs = null;
     public ScreenArgs screenArgs = null;
+    public int startingGlitchs = 3;
     public void Run()
     {   
         this.screen.Start();
+    }
+    public void SpawnGlitchs(int amount, int xLimit, int yLimit, int charW, int charH)
+    {
+        for (int i = 0; i < amount; i++)
+        {   
+            var glitch = new Glitch(
+                rnd.Next(0 + charW, xLimit - charW), 
+                rnd.Next(0 + charH, yLimit - charH)
+            );
+
+            this.glitches.Add(glitch);
+        }
     }
 
     public class GameBuilder

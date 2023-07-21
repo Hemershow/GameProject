@@ -4,7 +4,6 @@ using System.Windows.Forms;
 public abstract class KeyMap 
 {
     public Dictionary<Keys, bool> keyMapping { get; set; }
-    public Dictionary<string, bool> actions { get; set; }
     public abstract void SetAction(Form form);
 }
 
@@ -22,7 +21,9 @@ public class DefaultKeyMap : KeyMap
             {Keys.Left, false},
             {Keys.Up, false},
             {Keys.Down, false},
-            {Keys.ShiftKey, false}
+            {Keys.ShiftKey, false},
+            {Keys.X, false},
+            {Keys.Space, false}
         };
     }
 

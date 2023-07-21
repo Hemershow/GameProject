@@ -17,5 +17,5 @@ public class PlayerArgs : ProcessArgs
 
 public class ScreenArgs : ProcessArgs
 {
-    public int interval { get; set; } = 20;
+    public int interval { get; set; } = 3;
 }
