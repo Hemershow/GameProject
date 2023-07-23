@@ -14,9 +14,17 @@ public class Game
     public KeyMap keymap = null;
     public PlayerArgs playerArgs = null;
     public ScreenArgs screenArgs = null;
+    public ScreenSession gameScreen { get; set; } = new GameScreen();
+    public ScreenSession menu { get; set; } = new Menu();
+    public ScreenSession gameIntro { get; set; } = new Intro();
+    public ScreenSession shop { get; set; } = new Shop();
+    public Sprite map { get; set; } = new MapSprite();
     public int startingGlitchs = 3;
     public void Run()
     {   
+        this.screen.currentScreen = this.gameIntro;
+        this.gameIntro.nextScreen = this.menu;
+        this.menu.nextScreen = this.shop;
         this.screen.Start();
     }
     public void SpawnGlitchs(int amount, int xLimit, int yLimit, int charW, int charH)

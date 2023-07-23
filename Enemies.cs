@@ -80,8 +80,8 @@ public class Glitch : Enemy
             Game.Current.player.canMove = true;
             Game.Current.SpawnGlitchs(
                 3, 
-                Game.Current.screen.map.spriteW, 
-                Game.Current.screen.map.spriteH, 
+                Game.Current.map.spriteW, 
+                Game.Current.map.spriteH, 
                 Game.Current.player.playerSprite.spriteW, 
                 Game.Current.player.playerSprite.spriteH
             );
@@ -117,8 +117,8 @@ public class Bug : Enemy
         this.x = x;
         this.y = y;
         this.atack = false;
-        this.xObjective = this.rnd.Next(0, Game.Current.screen.map.spriteW);
-        this.yObjective = this.yObjective = this.rnd.Next(0, Game.Current.screen.map.spriteH);
+        this.xObjective = this.rnd.Next(0, Game.Current.map.spriteW);
+        this.yObjective = this.yObjective = this.rnd.Next(0, Game.Current.map.spriteH);
     }
 
     public override void Move(DateTime now) 

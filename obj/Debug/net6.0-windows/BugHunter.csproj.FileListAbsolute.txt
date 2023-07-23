@@ -13,3 +13,18 @@ C:\Users\disrct\Desktop\GameProject-master\obj\Debug\net6.0-windows\refint\BugHu
 C:\Users\disrct\Desktop\GameProject-master\obj\Debug\net6.0-windows\BugHunter.pdb
 C:\Users\disrct\Desktop\GameProject-master\obj\Debug\net6.0-windows\BugHunter.genruntimeconfig.cache
 C:\Users\disrct\Desktop\GameProject-master\obj\Debug\net6.0-windows\ref\BugHunter.dll
+C:\Users\hemer\OneDrive\Área de Trabalho\GameProject\bin\Debug\net6.0-windows\BugHunter.exe
+C:\Users\hemer\OneDrive\Área de Trabalho\GameProject\bin\Debug\net6.0-windows\BugHunter.deps.json
+C:\Users\hemer\OneDrive\Área de Trabalho\GameProject\bin\Debug\net6.0-windows\BugHunter.runtimeconfig.json
+C:\Users\hemer\OneDrive\Área de Trabalho\GameProject\bin\Debug\net6.0-windows\BugHunter.dll
+C:\Users\hemer\OneDrive\Área de Trabalho\GameProject\bin\Debug\net6.0-windows\BugHunter.pdb
+C:\Users\hemer\OneDrive\Área de Trabalho\GameProject\obj\Debug\net6.0-windows\BugHunter.csproj.AssemblyReference.cache
+C:\Users\hemer\OneDrive\Área de Trabalho\GameProject\obj\Debug\net6.0-windows\BugHunter.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\hemer\OneDrive\Área de Trabalho\GameProject\obj\Debug\net6.0-windows\BugHunter.AssemblyInfoInputs.cache
+C:\Users\hemer\OneDrive\Área de Trabalho\GameProject\obj\Debug\net6.0-windows\BugHunter.AssemblyInfo.cs
+C:\Users\hemer\OneDrive\Área de Trabalho\GameProject\obj\Debug\net6.0-windows\BugHunter.csproj.CoreCompileInputs.cache
+C:\Users\hemer\OneDrive\Área de Trabalho\GameProject\obj\Debug\net6.0-windows\BugHunter.dll
+C:\Users\hemer\OneDrive\Área de Trabalho\GameProject\obj\Debug\net6.0-windows\refint\BugHunter.dll
+C:\Users\hemer\OneDrive\Área de Trabalho\GameProject\obj\Debug\net6.0-windows\BugHunter.pdb
+C:\Users\hemer\OneDrive\Área de Trabalho\GameProject\obj\Debug\net6.0-windows\BugHunter.genruntimeconfig.cache
+C:\Users\hemer\OneDrive\Área de Trabalho\GameProject\obj\Debug\net6.0-windows\ref\BugHunter.dll

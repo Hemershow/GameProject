@@ -32,6 +32,7 @@ public abstract class AnimatedSprite
     {
         if ((now - this.latestChange).TotalMilliseconds > this.animationLenght/this.columns)
         {
+            this.currentColumn++;
             if (this.currentColumn == this.columns)
             {
                 this.currentColumn = 0;
@@ -40,9 +41,7 @@ public abstract class AnimatedSprite
             if (this.currentRow == this.rows)
             {
                 this.currentRow = 0;
-                this.currentColumn = 0;
             }
-            this.currentColumn++;
             this.latestChange = DateTime.Now;
         }
     }
@@ -125,7 +124,7 @@ public class MonitorSprite : Sprite
 {
     public MonitorSprite()
     {
-        this.image = new Bitmap(new Bitmap("./sprites/monitor.png"), 1926, 1086);
+        this.image = new Bitmap(new Bitmap("./sprites/monitor.png"), 1920, 1080);
         this.spriteW = this.image.Width;
         this.spriteH = this.image.Height;
     }
@@ -158,7 +157,18 @@ public class BugSprite : AnimatedSprite
 
     public override void UpdateSprites(DateTime now){}
 }
-
+public class MenuSprite : AnimatedSprite
+{
+    public MenuSprite()
+    {
+        this.image = new Bitmap(new Bitmap("./sprites/menu.png"), 3840, 2160);
+        this.columns = 2;
+        this.rows = 2;
+        this.spriteW = this.image.Width/this.columns;
+        this.spriteH = this.image.Height/this.rows;
+        this.animationLenght = 500;
+    }
+}
 public class BrainSprite : AnimatedSprite
 {
     public BrainSprite()
@@ -209,6 +219,46 @@ public class ReactionObjectiveSprite : Sprite
     public ReactionObjectiveSprite()
     {
         this.image = new Bitmap(new Bitmap("./sprites/objective.png"), 55, 130);
+        this.spriteW = this.image.Width;
+        this.spriteH = this.image.Height;
+    }
+}
+
+public class PlayBtnSprite : Sprite
+{
+    public PlayBtnSprite()
+    {
+        this.image = new Bitmap(new Bitmap("./sprites/playBtn.png"), 300, 150);
+        this.spriteW = this.image.Width;
+        this.spriteH = this.image.Height;
+    }
+}
+
+public class ShopSprite : Sprite
+{
+    public ShopSprite()
+    {
+        this.image = new Bitmap(new Bitmap("./sprites/shop.png"), 1788, 928);
+        this.spriteW = this.image.Width;
+        this.spriteH = this.image.Height;
+    }
+}
+
+public class HuntBtnSprite : Sprite
+{
+    public HuntBtnSprite()
+    {
+        this.image = new Bitmap(new Bitmap("./sprites/huntBtn.png"), 252, 141);
+        this.spriteW = this.image.Width;
+        this.spriteH = this.image.Height;
+    }
+}
+
+public class BuyBtnSprite : Sprite
+{
+    public BuyBtnSprite()
+    {
+        this.image = new Bitmap(new Bitmap("./sprites/buyBtn.png"), 114, 44);
         this.spriteW = this.image.Width;
         this.spriteH = this.image.Height;
     }

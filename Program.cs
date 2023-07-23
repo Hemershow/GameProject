@@ -6,7 +6,7 @@ var builder = Game.GetBuilder();
 
 builder.SetArgs()
     .SetPlayer<DefaultPlayer>()
-    .SetScreen<SpriteScreen>()
+    .SetScreen<DefaultScreen>()
     .SetKeyMapping<DefaultKeyMap>();
 
 Game.New(builder);
