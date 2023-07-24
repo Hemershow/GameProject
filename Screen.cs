@@ -73,13 +73,5 @@ public class DefaultScreen : Screen
         this.g.Clear(Color.Black);
         this.pb.Image = bmp;
         this.timer.Start();
-
-        Game.Current.SpawnGlitchs(
-            Game.Current.startingGlitchs, 
-            Game.Current.map.spriteW, 
-            Game.Current.map.spriteH, 
-            Game.Current.player.playerSprite.spriteW, 
-            Game.Current.player.playerSprite.spriteH
-        );
     }
 }

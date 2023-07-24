@@ -22,13 +22,16 @@ public abstract class Enemy
     public abstract void Atack(DateTime now);
     public virtual bool InRange()
     {
+        var enemyX = this.x - Game.Current.screen.currentScreen.x;
+        var enemyY = this.y - Game.Current.screen.currentScreen.y;
+        
         if (
-            Game.Current.player.x + this.enemySprite.spriteW + this.range < this.x &&
-            Game.Current.player.x - this.range > this.x
+            enemyX + this.enemySprite.spriteW + this.range >= Game.Current.player.mapX &&
+            enemyX - this.range <= Game.Current.player.mapX
         )
             if (
-                Game.Current.player.y + this.enemySprite.spriteH + this.range < this.y &&
-                Game.Current.player.y - this.range > this.y
+                enemyY + this.enemySprite.spriteH + this.range >= Game.Current.player.mapY &&
+                enemyY - this.range <= Game.Current.player.mapY
             )
                 return true;
         return false;
@@ -41,6 +44,7 @@ public abstract class Enemy
 
 public class Glitch : Enemy
 {
+    public int value { get; set; } = Game.Current.rnd.Next(15, 30);
     public bool inMinigame { get; set; } = false;
     public List<Enemy> bugs { get; set; } = new List<Enemy>();
     public Glitch(int x, int y)
@@ -93,7 +97,10 @@ public class Glitch : Enemy
             }
 
             if (this.miniGame.success)
+            {
                 Game.Current.glitches.RemoveAll(x => (x.x == this.x && x.y == this.y));
+                Game.Current.player.money += this.value;
+            }
             
             this.miniGame = new Reaction();
         }
@@ -151,9 +158,13 @@ public class Bug : Enemy
     }
     public override void Atack(DateTime now)
     {
-        // if (this.atack)
-        // {
-        //     if ()
-        // }
+        if (this.atack)
+        {
+            if (InRange())
+            {
+                Game.Current.player.stress += this.damage;
+                this.atack = false;
+            }       
+        }
     }
 }

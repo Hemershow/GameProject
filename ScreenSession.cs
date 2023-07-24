@@ -7,6 +7,8 @@ using System.Windows.Forms;
 
 public abstract class ScreenSession
 {
+    public int x { get; set; }
+    public int y { get; set; }
     public ScreenSession nextScreen { get; set; }
     public bool isFinished { get; set; }
     public abstract void DrawScreen(Graphics g, PictureBox pb, DateTime now);
@@ -40,6 +42,19 @@ public class GameScreen : ScreenSession
         }
 
         this.LoadSprites(g, pb);
+
+        if (Game.Current.player.stress >= 100)
+        {
+            Game.Current.player.stress = 0;
+            Game.Current.player.canMove = true;
+            this.isFinished = true;
+            this.nextScreen = Game.Current.shop;
+            this.nextScreen.isFinished = false;
+            Game.Current.glitches = new List<Glitch>();
+            Game.Current.rent.UpdateRound();
+        }
+
+        Game.Current.player.Work(now);
     }
     protected void LoadSprites(Graphics g, PictureBox pb)
     {  
@@ -51,38 +66,37 @@ public class GameScreen : ScreenSession
         this.DrawPlayer(g);
         this.DrawStatus(g);
         this.DrawMonitor(g);
-        this.DrawInfo(g);
+        // this.DrawInfo(g);
 
         pb.Refresh();
     }
 
-    private void DrawInfo(Graphics g)
-    {
-        double fps = 0;
-        this.queue.Enqueue(this.now);
+    // private void DrawInfo(Graphics g)
+    // {
+    //     double fps = 0;
+    //     this.queue.Enqueue(this.now);
 
-        if (this.queue.Count > 19)
-        {
-            DateTime old = this.queue.Dequeue();
-            var time = this.now - old;
-            fps = (int)(19 / time.TotalSeconds);
-        }
+    //     if (this.queue.Count > 19)
+    //     {
+    //         DateTime old = this.queue.Dequeue();
+    //         var time = this.now - old;
+    //         fps = (int)(19 / time.TotalSeconds);
+    //     }
 
-        string info = "----- FPS: " + fps.ToString() +
-            "----- enemies: " + Game.Current.glitches.Count.ToString() +
-            "----- mapX---: " + mapX +
-            "----- mapY---: " + mapY +
-            "----- playerY: " + yPositionT +
-            "----- playerX: " + xPositionT;
+    //     string info = "----- FPS: " + fps.ToString() +
+    //         "----- mapX---: " + mapX +
+    //         "----- mapY---: " + mapY +
+    //         "----- playerY: " + Game.Current.player.y +
+    //         "----- playerX: " + Game.Current.player.x;
 
-        g.DrawString(
-            info,
-            new Font("Arial", 25), 
-            new SolidBrush(Color.White), 
-            new RectangleF(0, 0, 300, 700), 
-            new StringFormat()
-        );
-    }
+    //     g.DrawString(
+    //         info,
+    //         new Font("Arial", 25), 
+    //         new SolidBrush(Color.White), 
+    //         new RectangleF(0, 0, 300, 700), 
+    //         new StringFormat()
+    //     );
+    // }
 
     private void DrawMap(Graphics g)
     {
@@ -118,7 +132,9 @@ public class GameScreen : ScreenSession
         );
 
         this.mapX = xPosition;
+        this.x = mapX;
         this.mapY = yPosition;
+        this.y = mapY;
     }
 
     private void DrawPlayer(Graphics g)
@@ -148,8 +164,8 @@ public class GameScreen : ScreenSession
             GraphicsUnit.Pixel
         );        
 
-        this.yPositionT = yPosition;
-        this.xPositionT = xPosition;
+        Game.Current.player.mapY = yPosition;
+        Game.Current.player.mapX = xPosition;
     }
 
     protected void MovePlayer()
@@ -345,7 +361,7 @@ public class Intro : ScreenSession
                 GraphicsUnit.Pixel
             );
 
-            if ((now - this.latestUpdate).TotalMilliseconds >= 3)
+            if ((now - this.latestUpdate).TotalMilliseconds >= 7.25)
             {
                 this.currentFrame++;
                 this.latestUpdate = DateTime.Now;
@@ -481,8 +497,16 @@ public class Shop : ScreenSession
             this.cursorLocation.Y >= huntBtn.y
         )
         {
-            this.nextScreen = Game.Current.gameScreen;
             this.isFinished = true;
+            this.nextScreen = Game.Current.gameScreen;
+            this.nextScreen.isFinished = false;
+            Game.Current.SpawnGlitchs(
+                Game.Current.startingGlitchs, 
+                Game.Current.map.spriteW, 
+                Game.Current.map.spriteH, 
+                Game.Current.player.playerSprite.spriteW, 
+                Game.Current.player.playerSprite.spriteH
+            );
         }
 
         g.DrawImage
@@ -500,6 +524,8 @@ public class Shop : ScreenSession
             GraphicsUnit.Pixel
         );
 
+        var brush = new SolidBrush(Color.Black);
+
         foreach (var btn in buyButtons)
         {
             g.DrawImage
@@ -516,7 +542,38 @@ public class Shop : ScreenSession
                 ),
                 GraphicsUnit.Pixel
             );
+
+
+            g.DrawString
+            (
+                ("$" + btn.cost.ToString()),
+                new Font("Arial", 30),
+                brush,
+                btn.x - 350,
+                btn.y,
+                new StringFormat()
+            );
         }
+
+        g.DrawString
+        (
+            Game.Current.player.money.ToString(),
+            new Font("Arial", 80),
+            new SolidBrush(Color.White),
+            210,
+            830,
+            new StringFormat()
+        );
+
+        g.DrawString
+        (
+            $"Rent: ${Game.Current.rent.cost} - Payday in {Game.Current.rent.rounds - Game.Current.rent.currentRound} rounds",
+            new Font("Arial", 25),
+            new SolidBrush(Color.White),
+            210,
+            800,
+            new StringFormat()
+        );
 
         g.DrawImage
         (

@@ -19,6 +19,7 @@ public class Game
     public ScreenSession gameIntro { get; set; } = new Intro();
     public ScreenSession shop { get; set; } = new Shop();
     public Sprite map { get; set; } = new MapSprite();
+    public Rent rent { get; set; } = new NormalRent(5, 500);
     public int startingGlitchs = 3;
     public void Run()
     {   
@@ -35,7 +36,6 @@ public class Game
                 rnd.Next(0 + charW, xLimit - charW), 
                 rnd.Next(0 + charH, yLimit - charH)
             );
-
             this.glitches.Add(glitch);
         }
     }

@@ -6,13 +6,18 @@ public abstract class Player
 {
     public AnimatedSprite playerSprite { get; set; }
     public int x { get; set;}
+    public int mapX { get; set;}
     public int y { get; set;}
+    public int mapY { get; set;}
     public int stress { get; set; } = 0;
     private int xMovement { get; set; } = 0;
     private int yMovement { get; set; } = 0;
     private int baseSpeed { get; set; } = 25;
     public bool canMove { get; set; } = true;
     public int reach { get; set; } = 150;
+    public float money { get; set; } = 0;
+    public int mentalResilience { get; set; } = 500;
+    public DateTime latestUpdate { get; set; } = DateTime.Now;
     public virtual void Move(int xLimit, int yLimit, int charW, int charH)
     {
         if (this.canMove)
@@ -47,6 +52,15 @@ public abstract class Player
     }
 
     public abstract bool InReachOfEnemy(Enemy enemy);
+    public virtual void Work(DateTime now)
+    {
+        if ((now - latestUpdate).TotalMilliseconds >= mentalResilience)
+        {
+            latestUpdate = DateTime.Now;
+            var luck = Game.Current.rnd.Next(1, 100);
+            stress +=  luck < 70 ? 1 : luck < 90 ? 2 : 0;
+        }
+    }
 }
 
 public class DefaultPlayer : Player

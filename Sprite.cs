@@ -183,14 +183,34 @@ public class BrainSprite : AnimatedSprite
 
     public override void UpdateSprites(DateTime now)
     {
-        if ((now - this.latestChange).TotalMilliseconds >= this.animationLenght/this.columns)
+        if ((now - this.latestChange).TotalMilliseconds > this.animationLenght/this.columns)
         {
             this.currentColumn++;
+            
+            if (this.currentColumn == this.columns)
+            {
+                this.currentColumn = 0;
+            }
+
+            var stress = Game.Current.player.stress;
+
+            switch (stress)
+            {
+                case < 50:
+                    this.currentRow = 0;
+                    break;
+
+                case < 75:
+                    this.currentRow = 1;
+                    break;
+
+                case < 100:
+                    this.currentRow = 2;
+                    break;
+            };
+
             this.latestChange = DateTime.Now;
         }
-
-        if (this.currentColumn >= this.columns)
-            this.currentColumn = 0;
     }
 }
 
