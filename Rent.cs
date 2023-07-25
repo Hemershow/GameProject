@@ -26,6 +26,11 @@ public class NormalRent : Rent
             this.currentRound = -1;
             Game.Current.player.money -= this.cost;
             IncreaseRent();
+
+            if (Game.Current.player.money < 0)
+            {
+                throw new GameOverException();
+            }
         }
 
         this.currentRound++;

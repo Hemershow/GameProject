@@ -12,14 +12,16 @@ public class Game
     public List<Glitch> glitches = new List<Glitch>();
     public Screen screen = null; 
     public KeyMap keymap = null;
+    public ComputerHealth pcHealth { get; set; } = new ComputerHealth();
     public PlayerArgs playerArgs = null;
     public ScreenArgs screenArgs = null;
     public ScreenSession gameScreen { get; set; } = new GameScreen();
     public ScreenSession menu { get; set; } = new Menu();
     public ScreenSession gameIntro { get; set; } = new Intro();
     public ScreenSession shop { get; set; } = new Shop();
+    public ScreenSession loading { get; set; } = new Loading();
     public Sprite map { get; set; } = new MapSprite();
-    public Rent rent { get; set; } = new NormalRent(5, 500);
+    public Rent rent { get; set; } = new NormalRent(5, 350);
     public int startingGlitchs = 3;
     public void Run()
     {   

@@ -48,7 +48,9 @@ public class GameScreen : ScreenSession
             Game.Current.player.stress = 0;
             Game.Current.player.canMove = true;
             this.isFinished = true;
-            this.nextScreen = Game.Current.shop;
+            this.nextScreen = Game.Current.loading;
+            this.nextScreen.nextScreen = Game.Current.shop;
+            this.nextScreen.nextScreen.isFinished = false;
             this.nextScreen.isFinished = false;
             Game.Current.glitches = new List<Glitch>();
             Game.Current.rent.UpdateRound();
@@ -65,7 +67,7 @@ public class GameScreen : ScreenSession
         this.DrawEnemies(g);
         this.DrawPlayer(g);
         this.DrawStatus(g);
-        this.DrawMonitor(g);
+        this.DrawMonitor(g, pb);
         // this.DrawInfo(g);
 
         pb.Refresh();
@@ -84,10 +86,7 @@ public class GameScreen : ScreenSession
     //     }
 
     //     string info = "----- FPS: " + fps.ToString() +
-    //         "----- mapX---: " + mapX +
-    //         "----- mapY---: " + mapY +
-    //         "----- playerY: " + Game.Current.player.y +
-    //         "----- playerX: " + Game.Current.player.x;
+    //         "----- pcHealth: " + Game.Current.pcHealth.health.ToString();
 
     //     g.DrawString(
     //         info,
@@ -284,8 +283,30 @@ public class GameScreen : ScreenSession
             );
     }
 
-    private void DrawMonitor(Graphics g)
+    private void DrawMonitor(Graphics g, PictureBox pb)
     {
+        Game.Current.pcHealth.Update(pb);
+
+        switch (Game.Current.pcHealth.health)
+        {
+            case 2: 
+                Game.Current.pcHealth.DrawError(g);
+                break;
+
+            case 1:
+                Game.Current.pcHealth.DrawError(g);
+                Game.Current.pcHealth.DrawAd(g);
+                break;
+
+            case 0:
+                Game.Current.pcHealth.DrawError(g);
+                Game.Current.pcHealth.DrawAd(g);
+                break;
+
+            default:
+                break;
+        }
+
         g.DrawImage
         (
             this.monitor.image,
@@ -498,8 +519,11 @@ public class Shop : ScreenSession
         )
         {
             this.isFinished = true;
-            this.nextScreen = Game.Current.gameScreen;
+            this.nextScreen = Game.Current.loading;
+            this.nextScreen.nextScreen = Game.Current.gameScreen;
             this.nextScreen.isFinished = false;
+            this.nextScreen.nextScreen.isFinished = false;
+
             Game.Current.SpawnGlitchs(
                 Game.Current.startingGlitchs, 
                 Game.Current.map.spriteW, 
@@ -590,6 +614,45 @@ public class Shop : ScreenSession
             0,
             0,
             new Rectangle(0, 0, monitor.spriteW, monitor.spriteH),
+            GraphicsUnit.Pixel
+        );
+    }
+}
+
+
+public class Loading : ScreenSession
+{
+    public AnimatedSprite loading { get; set; } = new LoadingSprite();
+    public Sprite monitor { get; set; } = new MonitorSprite();
+    public override void DrawScreen(Graphics g, PictureBox pb, DateTime now)
+    {
+        loading.UpdateSprites(now);
+        if (loading.currentColumn == loading.columns - 1 && loading.currentRow == loading.rows - 1)
+        {
+            this.isFinished = true;
+            loading.currentRow = 0;
+            loading.currentColumn = 0;
+        }
+
+        g.DrawImage
+        (
+            loading.image,
+            0,0,
+            new Rectangle(
+                loading.spriteW * loading.currentColumn, 
+                loading.spriteH * loading.currentRow, 
+                loading.spriteW,
+                loading.spriteH
+            ),
+            GraphicsUnit.Pixel
+        );
+
+        g.DrawImage
+        (
+            this.monitor.image,
+            0,
+            0,
+            new Rectangle(0, 0, this.monitor.spriteW, this.monitor.spriteH),
             GraphicsUnit.Pixel
         );
     }

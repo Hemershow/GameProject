@@ -12,7 +12,7 @@ public abstract class Screen
     public int interval { get; set; }
     public DateTime latestChange { get; set; }
     public Graphics g { get; set; } = null;
-    public PictureBox pb { get; set; } = null;
+    public PictureBox pb { get; set; } 
     public DateTime now { get; set;} = DateTime.Now;
     public ScreenSession currentScreen { get; set; }
 
@@ -25,10 +25,7 @@ public abstract class Screen
         this.forms.BackColor = Color.Black;
         this.timer = new Timer();
         this.timer.Interval = this.interval;
-
         this.forms.KeyPreview = true;
-
-        Game.Current.keymap.SetAction(this.forms);
 
         this.timer.Tick += delegate
         {
@@ -73,5 +70,6 @@ public class DefaultScreen : Screen
         this.g.Clear(Color.Black);
         this.pb.Image = bmp;
         this.timer.Start();
+        Game.Current.keymap.SetAction(this.forms, pb);
     }
 }

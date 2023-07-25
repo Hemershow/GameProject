@@ -283,3 +283,26 @@ public class BuyBtnSprite : Sprite
         this.spriteH = this.image.Height;
     }
 }
+
+public class AdSprite : Sprite
+{
+    public AdSprite()
+    {
+        this.image = new Bitmap(new Bitmap("./sprites/ad.png"), 976, 664);
+        this.spriteW = this.image.Width;
+        this.spriteH = this.image.Height;
+    }
+}
+
+public class LoadingSprite : AnimatedSprite
+{
+    public LoadingSprite()
+    {
+        this.image = new Bitmap("./sprites/loading.png");
+        this.columns = 5;
+        this.rows = 5;
+        this.spriteW = this.image.Width/this.columns;
+        this.spriteH = this.image.Height/this.rows;
+        this.animationLenght = 800;
+    }
+}
