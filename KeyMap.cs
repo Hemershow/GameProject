@@ -49,7 +49,7 @@ public class DefaultKeyMap : KeyMap
 
         pb.MouseDown += (s, e) =>
         {
-            this.mouseClick = true;
+            this.mouseClick = true; 
         };
         
         pb.MouseUp += (s, e) =>

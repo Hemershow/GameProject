@@ -31,7 +31,12 @@ public abstract class Screen
         {
             this.now = DateTime.Now;
             currentScreen.DrawScreen(this.g, this.pb, this.now);
-
+            
+            if (currentScreen != Game.Current.gameIntro &&
+                currentScreen != Game.Current.menu
+            )
+                Game.Current.playlist.Update();
+                
             if (this.currentScreen.isFinished)
             {
                 this.currentScreen = currentScreen.nextScreen;

@@ -402,6 +402,7 @@ public class Menu : ScreenSession
     public int currentFrame { get; set; } = 0;
     public bool musicStarted { get; set; } = false;
     public DateTime musicStart { get; set; }
+    public SoundPlayer outSoud { get; set; } = new SoundPlayer("./sounds/outMenu.wav");
     public SoundPlayer bgMusic { get; set; } = new SoundPlayer("./sounds/bgMenu.wav");
     public override void DrawScreen(Graphics g, PictureBox pb, DateTime now)
     {
@@ -472,8 +473,7 @@ public class Menu : ScreenSession
         {
             this.isFinished = true;
             this.bgMusic.Stop();
-            var outSoud = new SoundPlayer("./sounds/outMenu.wav");
-            outSoud.Play();
+            this.outSoud.Play();
         };
     }
 }
@@ -567,6 +567,16 @@ public class Shop : ScreenSession
                 GraphicsUnit.Pixel
             );
 
+            if (
+                mouseClick &&
+                this.cursorLocation.X <= (btn.x + btn.btnSprite.spriteW) &&
+                this.cursorLocation.X >= btn.x &&
+                this.cursorLocation.Y <= (btn.y + btn.btnSprite.spriteH) &&
+                this.cursorLocation.Y >= btn.y
+            )
+            {
+                btn.Buy();
+            }
 
             g.DrawString
             (

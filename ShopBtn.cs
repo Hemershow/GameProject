@@ -1,5 +1,9 @@
+using System.Media;
+
 public abstract class ShopBtn 
 {
+    public SoundPlayer tried { get; set; } = new SoundPlayer("./sounds/blocked.wav");
+    public SoundPlayer bought { get; set; } = new SoundPlayer("./sounds/bought.wav");
     public Sprite btnSprite { get; set; }
     public int cost { get; set; }
     public int x { get; set; }
@@ -19,6 +23,7 @@ public class UpgradePcBtn : ShopBtn
     }
     public override void Buy()
     {
+        tried.Play();
     }
 }
 
@@ -33,6 +38,7 @@ public class UpgradeMonitorBtn : ShopBtn
     }
     public override void Buy()
     {
+        bought.Play();
     }
 }
 

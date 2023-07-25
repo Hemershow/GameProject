@@ -22,6 +22,7 @@ public class Game
     public ScreenSession loading { get; set; } = new Loading();
     public Sprite map { get; set; } = new MapSprite();
     public Rent rent { get; set; } = new NormalRent(5, 350);
+    public Playlist playlist { get; set; } = new Playlist();
     public int startingGlitchs = 3;
     public void Run()
     {   
