@@ -157,6 +157,36 @@ public class BugSprite : AnimatedSprite
 
     public override void UpdateSprites(DateTime now){}
 }
+
+public class Bug2Sprite : AnimatedSprite
+{
+    public Bug2Sprite()
+    {
+        this.image = new Bitmap(new Bitmap("./sprites/bug2.png"), 100, 100);
+        this.columns = 1;
+        this.rows = 1;
+        this.spriteW = this.image.Width/this.columns;
+        this.spriteH = this.image.Height/this.rows;
+        this.animationLenght = 3000;
+    }
+
+    public override void UpdateSprites(DateTime now){}
+}
+public class Bug3Sprite : AnimatedSprite
+{
+    public Bug3Sprite()
+    {
+        this.image = new Bitmap(new Bitmap("./sprites/bug3.png"), 100, 100);
+        this.columns = 1;
+        this.rows = 1;
+        this.spriteW = this.image.Width/this.columns;
+        this.spriteH = this.image.Height/this.rows;
+        this.animationLenght = 3000;
+    }
+
+    public override void UpdateSprites(DateTime now){}
+}
+
 public class MenuSprite : AnimatedSprite
 {
     public MenuSprite()
