@@ -44,6 +44,7 @@ public abstract class Enemy
 
 public class Glitch : Enemy
 {
+    public int distanceFromPlayer { get; set; }
     public int value { get; set; } = Game.Current.rnd.Next(15, 30);
     public bool inMinigame { get; set; } = false;
     public List<Enemy> bugs { get; set; } = new List<Enemy>();

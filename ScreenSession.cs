@@ -153,6 +153,28 @@ public class GameScreen : ScreenSession
         if (player.y < yPosition || player.y > Game.Current.map.spriteH - yPosition - player.playerSprite.spriteH/2)
             yPosition = player.y - this.mapY;
 
+        if (Game.Current.player.canUseStackOverflow)
+        {
+            var nearestEnemy = Game.Current.NearestGlitch();
+            Game.Current.player.arrow.objective = nearestEnemy;
+            var arrow = Game.Current.player.arrow.SetAngle();
+    
+            g.DrawImage
+            (
+                arrow,
+                xPosition, 
+                yPosition, 
+                new Rectangle
+                (
+                    0,
+                    0,
+                    Game.Current.player.arrow.arrowSprite.spriteW,
+                    Game.Current.player.arrow.arrowSprite.spriteH
+                ),
+                GraphicsUnit.Pixel
+            );
+        }
+
         g.DrawImage(
             player.playerSprite.image, 
             xPosition, 
@@ -645,12 +667,6 @@ public class Loading : ScreenSession
     {
         loading.animationLenght = this.animationLenght;
         loading.UpdateSprites(now);
-        if (loading.currentColumn == loading.columns - 1 && loading.currentRow == loading.rows - 1)
-        {
-            this.isFinished = true;
-            loading.currentRow = 0;
-            loading.currentColumn = 0;
-        }
 
         g.DrawImage
         (
@@ -673,5 +689,12 @@ public class Loading : ScreenSession
             new Rectangle(0, 0, this.monitor.spriteW, this.monitor.spriteH),
             GraphicsUnit.Pixel
         );
+
+        if (loading.currentColumn == loading.columns - 1 && loading.currentRow == loading.rows - 1)
+        {
+            this.isFinished = true;
+            loading.currentRow = 0;
+            loading.currentColumn = 0;
+        }
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Drawing;
 
 public class Game
 {  
@@ -41,6 +42,26 @@ public class Game
             );
             this.glitches.Add(glitch);
         }
+    }
+
+    public Point NearestGlitch()
+    {
+        Glitch nearestGlitch = new Glitch(int.MaxValue, int.MaxValue);
+        
+        int distance = int.MaxValue;
+
+        foreach (var glitch in glitches)
+        {
+            glitch.distanceFromPlayer = Math.Abs(glitch.x - player.x) + Math.Abs(glitch.y - player.y); 
+            if (glitch.distanceFromPlayer < distance)
+            {
+                distance = glitch.distanceFromPlayer;
+                nearestGlitch = glitch;
+            }
+        }
+
+        return new Point(nearestGlitch.x, nearestGlitch.y);
+        
     }
 
     public class GameBuilder

@@ -5,6 +5,7 @@ using System.Windows.Forms;
 public abstract class Player
 {
     public AnimatedSprite playerSprite { get; set; }
+    public Arrow arrow { get; set; } = new Arrow();
     public int lv { get; set; } = 0;
     public int x { get; set;}
     public int mapX { get; set;}
