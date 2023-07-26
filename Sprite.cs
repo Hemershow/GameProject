@@ -328,7 +328,7 @@ public class ArrowSprite : Sprite
 {
     public ArrowSprite()
     {
-        this.image = new Bitmap(new Bitmap("./sprites/arrow.png"), 360, 360);
+        this.image = new Bitmap(new Bitmap("./sprites/arrow.png"), 100, 100);
         this.spriteW = this.image.Width;
         this.spriteH = this.image.Height;
     }

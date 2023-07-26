@@ -89,7 +89,10 @@ public class GameScreen : ScreenSession
     //     }
 
     //     string info = "----- FPS: " + fps.ToString() +
-    //         "----- pcHealth: " + Game.Current.pcHealth.health.ToString();
+    //         "----- nearestEnemyX: " + Game.Current.NearestGlitch().X + 
+    //         "----- nearestEnemyY: " + Game.Current.NearestGlitch().Y +
+    //         "--- angle: " + (int)(Game.Current.player.arrow.angle) +
+    //         "----- quadrant: " + Game.Current.player.arrow.quadrant;
 
     //     g.DrawString(
     //         info,
@@ -162,14 +165,14 @@ public class GameScreen : ScreenSession
             g.DrawImage
             (
                 arrow,
-                xPosition, 
-                yPosition, 
+                xPosition + Game.Current.player.playerSprite.spriteW/2 - arrow.Width/2, 
+                yPosition + Game.Current.player.playerSprite.spriteH/2 - arrow.Height/2, 
                 new Rectangle
                 (
                     0,
                     0,
-                    Game.Current.player.arrow.arrowSprite.spriteW,
-                    Game.Current.player.arrow.arrowSprite.spriteH
+                    arrow.Width,
+                    arrow.Height
                 ),
                 GraphicsUnit.Pixel
             );
