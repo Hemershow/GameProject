@@ -9,6 +9,11 @@ public class Arrow
     public double deltaX { get; set; }
     public double deltaY { get; set; }
     public Sprite arrowSprite { get; set; } = new ArrowSprite();
+    public Bitmap bmp { get; set; } 
+    public Arrow()
+    {
+        this.bmp = new Bitmap(arrowSprite.spriteW * 5, arrowSprite.spriteH * 5);
+    }
     public Bitmap SetAngle()
     {
         this.deltaX = (this.objective.X - Game.Current.player.x) - Game.Current.player.playerSprite.spriteW/2;
@@ -48,8 +53,7 @@ public class Arrow
                 
         }
 
-        Bitmap bmp = new Bitmap(arrowSprite.spriteW * 5, arrowSprite.spriteH * 5);
-        Graphics gfx = Graphics.FromImage(bmp);
+        var gfx = Graphics.FromImage(bmp);
         gfx.Clear(Color.Transparent);
         gfx.TranslateTransform((float)bmp.Width / 2, (float)bmp.Height / 2);
         gfx.RotateTransform((float)(angle - 45));

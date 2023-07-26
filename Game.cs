@@ -11,6 +11,8 @@ public class Game
     public Player player = null; 
     public Random rnd { get; set; } = new Random();
     public List<Glitch> glitches = new List<Glitch>();
+    public List<Point> glitchPoints { get; set; } = new List<Point>();
+    public Glitch nearestGlitch { get; set; } 
     public Screen screen = null; 
     public KeyMap keymap = null;
     public ComputerHealth pcHealth { get; set; } = new ComputerHealth();
@@ -41,26 +43,27 @@ public class Game
                 rnd.Next(0 + charH, yLimit - charH)
             );
             this.glitches.Add(glitch);
+            this.glitchPoints.Add(new Point(glitch.x, glitch.y));
         }
     }
 
     public Point NearestGlitch()
     {
-        Glitch nearestGlitch = new Glitch(int.MaxValue, int.MaxValue);
-        
-        int distance = int.MaxValue;
+        int shortestDistance = int.MaxValue;
+        int index = -1;
 
-        foreach (var glitch in glitches)
+        for (int i = 0; i < glitchPoints.Count; i++)
         {
-            glitch.distanceFromPlayer = Math.Abs(glitch.x - player.x) + Math.Abs(glitch.y - player.y); 
-            if (glitch.distanceFromPlayer < distance)
+            var distanceFromPlayer = Math.Abs(glitchPoints[i].X - player.x) + Math.Abs(glitchPoints[i].Y - player.y); 
+            
+            if (distanceFromPlayer < shortestDistance)
             {
-                distance = glitch.distanceFromPlayer;
-                nearestGlitch = glitch;
+                shortestDistance = distanceFromPlayer;
+                index = i;
             }
         }
 
-        return new Point(nearestGlitch.x, nearestGlitch.y);
+        return glitchPoints[index];
         
     }
 

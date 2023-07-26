@@ -27,6 +27,7 @@ public class GameScreen : ScreenSession
     public Queue<DateTime> queue { get; set; } = new Queue<DateTime>();
     public DateTime now { get; set; }
     public DateTime latestChange { get; set; }
+    public bool drawArrow { get; set; } = true;
     public GameScreen()
     {
         this.queue.Enqueue(DateTime.Now);
@@ -71,37 +72,37 @@ public class GameScreen : ScreenSession
         this.DrawPlayer(g);
         this.DrawStatus(g);
         this.DrawMonitor(g, pb);
-        // this.DrawInfo(g);
+        this.DrawInfo(g);
 
         pb.Refresh();
     }
 
-    // private void DrawInfo(Graphics g)
-    // {
-    //     double fps = 0;
-    //     this.queue.Enqueue(this.now);
+    private void DrawInfo(Graphics g)
+    {
+        double fps = 0;
+        this.queue.Enqueue(this.now);
 
-    //     if (this.queue.Count > 19)
-    //     {
-    //         DateTime old = this.queue.Dequeue();
-    //         var time = this.now - old;
-    //         fps = (int)(19 / time.TotalSeconds);
-    //     }
+        if (this.queue.Count > 19)
+        {
+            DateTime old = this.queue.Dequeue();
+            var time = this.now - old;
+            fps = (int)(19 / time.TotalSeconds);
+        }
 
-    //     string info = "----- FPS: " + fps.ToString() +
-    //         "----- nearestEnemyX: " + Game.Current.NearestGlitch().X + 
-    //         "----- nearestEnemyY: " + Game.Current.NearestGlitch().Y +
-    //         "--- angle: " + (int)(Game.Current.player.arrow.angle) +
-    //         "----- quadrant: " + Game.Current.player.arrow.quadrant;
+        string info = "----- FPS: " + fps.ToString();
+            // "----- nearestEnemyX: " + Game.Current.NearestGlitch().X + 
+            // "----- nearestEnemyY: " + Game.Current.NearestGlitch().Y +
+            // "--- angle: " + (int)(Game.Current.player.arrow.angle) +
+            // "----- quadrant: " + Game.Current.player.arrow.quadrant;
 
-    //     g.DrawString(
-    //         info,
-    //         new Font("Arial", 25), 
-    //         new SolidBrush(Color.White), 
-    //         new RectangleF(0, 0, 300, 700), 
-    //         new StringFormat()
-    //     );
-    // }
+        g.DrawString(
+            info,
+            new Font("Arial", 25), 
+            new SolidBrush(Color.White), 
+            new RectangleF(0, 0, 300, 700), 
+            new StringFormat()
+        );
+    }
 
     private void DrawMap(Graphics g)
     {
@@ -156,7 +157,7 @@ public class GameScreen : ScreenSession
         if (player.y < yPosition || player.y > Game.Current.map.spriteH - yPosition - player.playerSprite.spriteH/2)
             yPosition = player.y - this.mapY;
 
-        if (Game.Current.player.canUseStackOverflow)
+        if (Game.Current.player.canUseStackOverflow && drawArrow)
         {
             var nearestEnemy = Game.Current.NearestGlitch();
             Game.Current.player.arrow.objective = nearestEnemy;
@@ -176,7 +177,9 @@ public class GameScreen : ScreenSession
                 ),
                 GraphicsUnit.Pixel
             );
+            
         }
+        this.drawArrow = true;
 
         g.DrawImage(
             player.playerSprite.image, 
@@ -225,6 +228,7 @@ public class GameScreen : ScreenSession
 
     private void DrawEnemies(Graphics g)
     {
+    
         for (int i = 0; i < Game.Current.glitches.Count; i++)
         {
             var glitch = Game.Current.glitches[i];
@@ -233,10 +237,20 @@ public class GameScreen : ScreenSession
                 this.DrawEnemy(glitch.bugs[j], g);
 
             if (Game.Current.player.InReachOfEnemy(glitch))
+            {
                 this.DrawButton(glitch, g);
+                this.drawArrow = false;
+            
+                if (Game.Current.player.hasHackerVision)
+                {
+                    this.DrawEnemyInfo(glitch, g);
+                }
+            }   
+
 
             if (glitch.inMinigame)
             {
+                this.drawArrow = false;
                 this.DrawMinigame(glitch, g);
                 glitch.Debug(this.now);
             }
@@ -309,6 +323,19 @@ public class GameScreen : ScreenSession
                 ),
                 GraphicsUnit.Pixel
             );
+    }
+
+    private void DrawEnemyInfo(Enemy enemy, Graphics g)
+    {
+        g.DrawString
+        (
+            $"Lv: {enemy.lv} - Reward: $ {enemy.value}",
+            new Font("Arial", 15),
+            new SolidBrush(Color.White),
+            enemy.x + enemy.enemySprite.spriteW/2 - this.mapX - 100,
+            enemy.y - enemy.enemySprite.spriteH * 3 + 100 - this.mapY,
+            new StringFormat()
+        );
     }
 
     private void DrawMonitor(Graphics g, PictureBox pb)

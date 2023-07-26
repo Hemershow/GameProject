@@ -7,6 +7,8 @@ using System.Windows.Forms;
 public abstract class Enemy
 {
     public MiniGame miniGame { get; set; }
+    public int value { get; set; }
+    public int lv { get; set; } = 0;
     public AnimatedSprite enemySprite { get; set; }
     public Random rnd { get; set; }
     public bool atack { get; set; }
@@ -45,7 +47,6 @@ public abstract class Enemy
 public class Glitch : Enemy
 {
     public int distanceFromPlayer { get; set; }
-    public int value { get; set; } = Game.Current.rnd.Next(15, 30);
     public bool inMinigame { get; set; } = false;
     public List<Enemy> bugs { get; set; } = new List<Enemy>();
     public Glitch(int x, int y)
@@ -59,6 +60,7 @@ public class Glitch : Enemy
         this.atack = true;
         this.x = x;
         this.y = y;
+        this.value = Game.Current.rnd.Next(15, 30);
     }
 
     public override void Move(DateTime now) {}
@@ -100,6 +102,7 @@ public class Glitch : Enemy
             if (this.miniGame.success)
             {
                 Game.Current.glitches.RemoveAll(x => (x.x == this.x && x.y == this.y));
+                Game.Current.glitchPoints.RemoveAll(x => (x.X == this.x && x.Y == this.y));
                 Game.Current.player.money += this.value;
             }
             
@@ -164,6 +167,9 @@ public class Bug : Enemy
             if (InRange())
             {
                 Game.Current.player.stress += this.damage;
+                if (Game.Current.player.stress >= 100)
+                    Game.Current.pcHealth.health += Game.Current.pcHealth.health - 1 > 0 ? -1 : 0;
+                    
                 this.atack = false;
             }       
         }
