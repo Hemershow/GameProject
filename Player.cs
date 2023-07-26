@@ -5,6 +5,7 @@ using System.Windows.Forms;
 public abstract class Player
 {
     public AnimatedSprite playerSprite { get; set; }
+    public int lv { get; set; } = 0;
     public int x { get; set;}
     public int mapX { get; set;}
     public int y { get; set;}
@@ -12,10 +13,14 @@ public abstract class Player
     public int stress { get; set; } = 0;
     private int xMovement { get; set; } = 0;
     private int yMovement { get; set; } = 0;
-    private int baseSpeed { get; set; } = 25;
+    public int baseSpeed { get; set; } = 25;
     public bool canMove { get; set; } = true;
     public int reach { get; set; } = 150;
-    public float money { get; set; } = 0;
+    public float money { get; set; } = 10000;
+    public bool canRun { get; set; } = false;
+    public bool relaxed { get; set; } = false;
+    public bool canUseStackOverflow { get; set; } = false;
+    public bool hasHackerVision { get; set; } = false;
     public int mentalResilience { get; set; } = 500;
     public DateTime latestUpdate { get; set; } = DateTime.Now;
     public virtual void Move(int xLimit, int yLimit, int charW, int charH)
@@ -27,16 +32,16 @@ public abstract class Player
             if (keyMap[Keys.Left] && keyMap[Keys.Right])
                 this.xMovement = 0;
             else if (keyMap[Keys.Right]) 
-                this.xMovement = this.baseSpeed + (keyMap[Keys.ShiftKey] ? this.baseSpeed : 0);
+                this.xMovement = this.baseSpeed + ((keyMap[Keys.ShiftKey] && canRun) ? this.baseSpeed : 0);
             else if (keyMap[Keys.Left])
-                this.xMovement = -(this.baseSpeed + (keyMap[Keys.ShiftKey] ? this.baseSpeed : 0));
+                this.xMovement = -(this.baseSpeed + ((keyMap[Keys.ShiftKey] && canRun) ? this.baseSpeed : 0));
 
             if (keyMap[Keys.Down] && keyMap[Keys.Up])
                 this.yMovement = 0;
             else if (keyMap[Keys.Down])
-                this.yMovement = this.baseSpeed + (keyMap[Keys.ShiftKey] ? this.baseSpeed : 0);
+                this.yMovement = this.baseSpeed + ((keyMap[Keys.ShiftKey] && canRun) ? this.baseSpeed : 0);
             else if (keyMap[Keys.Up])
-                this.yMovement = -(this.baseSpeed + (keyMap[Keys.ShiftKey] ? this.baseSpeed : 0));
+                this.yMovement = -(this.baseSpeed + ((keyMap[Keys.ShiftKey] && canRun) ? this.baseSpeed : 0));
 
             if (!(this.x + xMovement < charW/2))
                 if (!(this.x + xMovement > xLimit - charW))
@@ -54,7 +59,7 @@ public abstract class Player
     public abstract bool InReachOfEnemy(Enemy enemy);
     public virtual void Work(DateTime now)
     {
-        if ((now - latestUpdate).TotalMilliseconds >= mentalResilience)
+        if ((now - latestUpdate).TotalMilliseconds >= mentalResilience + (relaxed ? mentalResilience : 0))
         {
             latestUpdate = DateTime.Now;
             var luck = Game.Current.rnd.Next(1, 100);

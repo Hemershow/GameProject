@@ -333,6 +333,5 @@ public class LoadingSprite : AnimatedSprite
         this.rows = 5;
         this.spriteW = this.image.Width/this.columns;
         this.spriteH = this.image.Height/this.rows;
-        this.animationLenght = 800;
     }
 }

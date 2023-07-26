@@ -11,6 +11,7 @@ public class ComputerHealth
     public bool DrawBlackScreen { get; set; } = false;
     public bool drawAd { get; set; } = false;
     public int health { get; set; } = 3;
+    public int healthLimit { get; set; } = 3;
     public bool mouseClick { get; set; } = false;
     public Point cursorLocation { get; set; }
 

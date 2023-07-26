@@ -7,6 +7,7 @@ using System.Windows.Forms;
 
 public abstract class ScreenSession
 {
+    public int animationLenght { get; set; }
     public int x { get; set; }
     public int y { get; set; }
     public ScreenSession nextScreen { get; set; }
@@ -53,6 +54,8 @@ public class GameScreen : ScreenSession
             this.nextScreen.nextScreen.isFinished = false;
             this.nextScreen.isFinished = false;
             Game.Current.glitches = new List<Glitch>();
+            Game.Current.player.canRun = false;
+            Game.Current.player.relaxed = false;
             Game.Current.rent.UpdateRound();
         }
 
@@ -634,8 +637,13 @@ public class Loading : ScreenSession
 {
     public AnimatedSprite loading { get; set; } = new LoadingSprite();
     public Sprite monitor { get; set; } = new MonitorSprite();
+    public Loading()
+    {
+        this.animationLenght = 800;
+    }
     public override void DrawScreen(Graphics g, PictureBox pb, DateTime now)
     {
+        loading.animationLenght = this.animationLenght;
         loading.UpdateSprites(now);
         if (loading.currentColumn == loading.columns - 1 && loading.currentRow == loading.rows - 1)
         {
