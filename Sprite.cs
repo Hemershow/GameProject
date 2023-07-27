@@ -344,4 +344,22 @@ public class LoadingSprite : AnimatedSprite
         this.spriteW = this.image.Width/this.columns;
         this.spriteH = this.image.Height/this.rows;
     }
+
+    public override void UpdateSprites(DateTime now)
+    {
+        if ((now - this.latestChange).TotalMilliseconds > Game.Current.pcLoading/this.columns)
+        {
+            this.currentColumn++;
+            if (this.currentColumn == this.columns)
+            {
+                this.currentColumn = 0;
+                this.currentRow++;
+            }
+            if (this.currentRow == this.rows)
+            {
+                this.currentRow = 0;
+            }
+            this.latestChange = DateTime.Now;
+        }
+    }
 }

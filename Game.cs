@@ -23,6 +23,7 @@ public class Game
     public ScreenSession gameIntro { get; set; } = new Intro();
     public ScreenSession shop { get; set; } = new Shop();
     public ScreenSession loading { get; set; } = new Loading();
+    public int pcLoading { get; set; } = 1600;
     public Sprite map { get; set; } = new MapSprite();
     public Rent rent { get; set; } = new NormalRent(5, 350);
     public Playlist playlist { get; set; } = new Playlist();
@@ -34,14 +35,19 @@ public class Game
         this.menu.nextScreen = this.shop;
         this.screen.Start();
     }
-    public void SpawnGlitchs(int amount, int xLimit, int yLimit, int charW, int charH)
+    public void SpawnGlitchs(int amount, int xLimit, int yLimit, int charW, int charH, bool random)
     {
+        if (!random)
+            glitchPoints.Clear();
+
         for (int i = 0; i < amount; i++)
         {   
             var glitch = new Glitch(
                 rnd.Next(0 + charW, xLimit - charW), 
-                rnd.Next(0 + charH, yLimit - charH)
+                rnd.Next(0 + charH, yLimit - charH),
+                random ? rnd.Next(0, 4) : 0
             );
+
             this.glitches.Add(glitch);
             this.glitchPoints.Add(new Point(glitch.x, glitch.y));
         }

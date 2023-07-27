@@ -49,18 +49,20 @@ public class Glitch : Enemy
     public int distanceFromPlayer { get; set; }
     public bool inMinigame { get; set; } = false;
     public List<Enemy> bugs { get; set; } = new List<Enemy>();
-    public Glitch(int x, int y)
+    public int[] speeds { get; set; } = new int[] { 5000, 4000, 3500, 2000 };
+    public Glitch(int x, int y, int lv)
     {
-        this.miniGame = new Reaction();
+        this.lv = lv;
+        this.miniGame = new Reaction(lv);
         this.latestAtack = DateTime.Now;
         this.enemySprite = new GlitchSprite();
         this.damage = 0;
-        this.atackSpeed = 5000;
+        this.atackSpeed = speeds[lv];
         this.range = -1;
         this.atack = true;
         this.x = x;
         this.y = y;
-        this.value = Game.Current.rnd.Next(15, 30);
+        this.value = Game.Current.rnd.Next(15, 30) * (lv + 1);
     }
 
     public override void Move(DateTime now) {}
@@ -68,7 +70,26 @@ public class Glitch : Enemy
     {
         if ((now - this.latestAtack).TotalMilliseconds > this.atackSpeed)
         {
-            this.bugs.Add(new Bug(this.x, this.y));
+            switch(this.lv)
+            {
+                case 0:
+                    this.bugs.Add(new Bug(this.x, this.y));
+                    break;
+                
+                case 1:
+                    this.bugs.Add(new Bug2(this.x, this.y));
+                    break;
+
+                case 2:
+                    this.bugs.Add(new Bug3(this.x, this.y));
+                    break;
+                
+                case 3:
+                    this.bugs.Add(new Bug2(this.x, this.y));
+                    this.bugs.Add(new Bug3(this.x, this.y));
+                    break;
+            }
+
             this.latestAtack = DateTime.Now;
         }
     }
@@ -90,7 +111,8 @@ public class Glitch : Enemy
                 Game.Current.map.spriteW, 
                 Game.Current.map.spriteH, 
                 Game.Current.player.playerSprite.spriteW, 
-                Game.Current.player.playerSprite.spriteH
+                Game.Current.player.playerSprite.spriteH,
+                true
             );
         
             foreach (var glitch in Game.Current.glitches)
@@ -106,7 +128,7 @@ public class Glitch : Enemy
                 Game.Current.player.money += this.value;
             }
             
-            this.miniGame = new Reaction();
+            this.miniGame = new Reaction(this.lv);
         }
         else 
             inMinigame = true;
@@ -171,6 +193,133 @@ public class Bug : Enemy
                     Game.Current.pcHealth.health += Game.Current.pcHealth.health - 1 > 0 ? -1 : 0;
                     
                 this.atack = false;
+            }       
+        }
+    }
+}
+
+public class Bug2 : Enemy
+{
+    public int xObjective { get; set; } = -1;
+    public int yObjective { get; set; } = -1;
+    public DateTime atackTimer { get; set; }
+    public bool startedAtacking { get; set; } = false; 
+    public Bug2(int x, int y)
+    {
+        this.enemySprite = new Bug2Sprite();
+        this.rnd = new Random();
+        this.damage = 5;
+        this.speed = 20;
+        this.atackSpeed = 1000;
+        this.range = 10;
+        this.x = x;
+        this.y = y;
+        this.atack = false;
+        this.xObjective = this.rnd.Next(0, Game.Current.map.spriteW);
+        this.yObjective = this.yObjective = this.rnd.Next(0, Game.Current.map.spriteH);
+    }
+
+    public override void Move(DateTime now) 
+    {
+        if (this.atack && !startedAtacking)
+        {
+            this.startedAtacking = true;
+            atackTimer = DateTime.Now;
+        }
+
+        if (startedAtacking && (now - atackTimer).TotalMilliseconds >= 8000)
+        {
+            this.atack = false;
+            this.startedAtacking = false;
+        }
+
+        if (this.atack)
+        {
+            if (Math.Abs(Game.Current.player.x - this.x) > this.range)
+                this.x += Game.Current.player.x > this.x ? this.speed : -this.speed;
+            if (Math.Abs(Game.Current.player.y - this.y) > this.range)
+                this.y += Game.Current.player.y > this.y ? this.speed : -this.speed;
+        }
+        else
+        {
+            if (
+                this.xObjective - this.speed >= this.x && 
+                this.xObjective + this.speed <= this.x
+            )
+                this.xObjective = this.rnd.Next(this.x - 540, this.x + 540);
+            if (
+                this.yObjective - this.speed >= this.y && 
+                this.yObjective + this.speed <= this.y
+            )
+                this.yObjective = this.rnd.Next(this.y - 960, this.y + 960);
+            
+            this.x += xObjective > this.x ? this.speed : -this.speed;
+            this.y += yObjective > this.x ? this.speed : -this.speed;
+        }
+    }
+    public override void Atack(DateTime now)
+    {
+        if (this.atack)
+        {
+            if (InRange())
+            {
+                Game.Current.player.stress += this.damage;
+                if (Game.Current.player.stress >= 100)
+                    Game.Current.pcHealth.health += Game.Current.pcHealth.health - 1 > 0 ? -1 : 0;
+                    
+                this.atack = false;
+            }       
+        }
+    }
+}
+
+public class Bug3 : Enemy
+{
+    public int xObjective { get; set; } = -1;
+    public int yObjective { get; set; } = -1;
+    public Bug3(int x, int y)
+    {
+        this.latestAtack = DateTime.Now;
+        this.enemySprite = new Bug3Sprite();
+        this.rnd = new Random();
+        this.damage = 25;
+        this.speed = 7;
+        this.atackSpeed = 1000;
+        this.range = 15;
+        this.x = x;
+        this.y = y;
+        this.atack = true;
+        this.xObjective = this.rnd.Next(0, Game.Current.map.spriteW);
+        this.yObjective = this.yObjective = this.rnd.Next(0, Game.Current.map.spriteH);
+    }
+
+    public override void Move(DateTime now) 
+    {
+        if (
+                this.xObjective - this.speed >= this.x && 
+                this.xObjective + this.speed <= this.x
+        )
+            this.xObjective = this.rnd.Next(this.x - 540, this.x + 540);
+        if (
+            this.yObjective - this.speed >= this.y && 
+            this.yObjective + this.speed <= this.y
+        )
+            this.yObjective = this.rnd.Next(this.y - 960, this.y + 960);
+        
+        this.x += xObjective > this.x ? this.speed : -this.speed;
+        this.y += yObjective > this.x ? this.speed : -this.speed;
+    }
+    public override void Atack(DateTime now)
+    {
+        if (this.atack && (now - latestAtack).TotalMilliseconds >= this.atackSpeed)
+        {
+            if (InRange())
+            {
+                Game.Current.player.stress += this.damage;
+                if (Game.Current.player.stress >= 100)
+                    Game.Current.pcHealth.health += Game.Current.pcHealth.health - 1 > 0 ? -1 : 0;
+                
+                latestAtack = now;
             }       
         }
     }

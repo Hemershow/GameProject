@@ -20,12 +20,14 @@ public class Reaction : MiniGame
     public DateTime latestChange { get; set; } = DateTime.Now;
     public Sprite guide { get; set; }
     public Sprite objective { get; set; }
-    public int guideDirection { get; set; } = 30;
+    public int guideDirection { get; set; }
     public int border { get; set; } = 10;
     public bool lockGuide { get; set; } = false;
     public int waitDelay { get; set; } = 500;
-    public Reaction()
+    public Reaction(int GLitchlv)
     {
+        var dificulty = (GLitchlv - Game.Current.player.lv);
+        this.guideDirection = 30 + 30 * (dificulty > 0 ? dificulty : 0);
         this.structure = new ReactionStructureSprite();
         this.components = new Sprite[] {new ReactionGuideSprite(), new ReactionObjectiveSprite()};
         this.guide = this.components[0];

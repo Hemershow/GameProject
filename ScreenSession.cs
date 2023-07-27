@@ -72,37 +72,37 @@ public class GameScreen : ScreenSession
         this.DrawPlayer(g);
         this.DrawStatus(g);
         this.DrawMonitor(g, pb);
-        this.DrawInfo(g);
+        // this.DrawInfo(g);
 
         pb.Refresh();
     }
 
-    private void DrawInfo(Graphics g)
-    {
-        double fps = 0;
-        this.queue.Enqueue(this.now);
+    // private void DrawInfo(Graphics g)
+    // {
+    //     double fps = 0;
+    //     this.queue.Enqueue(this.now);
 
-        if (this.queue.Count > 19)
-        {
-            DateTime old = this.queue.Dequeue();
-            var time = this.now - old;
-            fps = (int)(19 / time.TotalSeconds);
-        }
+    //     if (this.queue.Count > 19)
+    //     {
+    //         DateTime old = this.queue.Dequeue();
+    //         var time = this.now - old;
+    //         fps = (int)(19 / time.TotalSeconds);
+    //     }
 
-        string info = "----- FPS: " + fps.ToString();
-            // "----- nearestEnemyX: " + Game.Current.NearestGlitch().X + 
-            // "----- nearestEnemyY: " + Game.Current.NearestGlitch().Y +
-            // "--- angle: " + (int)(Game.Current.player.arrow.angle) +
-            // "----- quadrant: " + Game.Current.player.arrow.quadrant;
+    //     string info = "----- FPS: " + fps.ToString();
+    //         // "----- nearestEnemyX: " + Game.Current.NearestGlitch().X + 
+    //         // "----- nearestEnemyY: " + Game.Current.NearestGlitch().Y +
+    //         // "--- angle: " + (int)(Game.Current.player.arrow.angle) +
+    //         // "----- quadrant: " + Game.Current.player.arrow.quadrant;
 
-        g.DrawString(
-            info,
-            new Font("Arial", 25), 
-            new SolidBrush(Color.White), 
-            new RectangleF(0, 0, 300, 700), 
-            new StringFormat()
-        );
-    }
+    //     g.DrawString(
+    //         info,
+    //         new Font("Arial", 25), 
+    //         new SolidBrush(Color.White), 
+    //         new RectangleF(0, 0, 300, 700), 
+    //         new StringFormat()
+    //     );
+    // }
 
     private void DrawMap(Graphics g)
     {
@@ -417,7 +417,7 @@ public class Intro : ScreenSession
             var index = ((this.currentFrame < 10 ? "00" : this.currentFrame < 100 ? "0" : "") + this.currentFrame.ToString());
             var frame = new Bitmap(new Bitmap($"./introFiles/{index}.png"), 1920, 1080);
 
-            if (keyMap.keyMapping[Keys.Space] || (DateTime.Now - this.start).TotalMilliseconds >= 23000)
+            if (keyMap.keyMapping[Keys.Space] || (DateTime.Now - this.start).TotalMilliseconds >= 22000)
             {
                 this.simpleSound.Stop();
                 this.isFinished = true;
@@ -437,7 +437,7 @@ public class Intro : ScreenSession
                 GraphicsUnit.Pixel
             );
 
-            if ((now - this.latestUpdate).TotalMilliseconds >= 7.25)
+            if ((DateTime.Now - this.latestUpdate).TotalMilliseconds >= 74.5)
             {
                 this.currentFrame++;
                 this.latestUpdate = DateTime.Now;
@@ -584,7 +584,8 @@ public class Shop : ScreenSession
                 Game.Current.map.spriteW, 
                 Game.Current.map.spriteH, 
                 Game.Current.player.playerSprite.spriteW, 
-                Game.Current.player.playerSprite.spriteH
+                Game.Current.player.playerSprite.spriteH, 
+                false
             );
         }
 
@@ -689,13 +690,8 @@ public class Loading : ScreenSession
 {
     public AnimatedSprite loading { get; set; } = new LoadingSprite();
     public Sprite monitor { get; set; } = new MonitorSprite();
-    public Loading()
-    {
-        this.animationLenght = 800;
-    }
     public override void DrawScreen(Graphics g, PictureBox pb, DateTime now)
     {
-        loading.animationLenght = this.animationLenght;
         loading.UpdateSprites(now);
 
         g.DrawImage

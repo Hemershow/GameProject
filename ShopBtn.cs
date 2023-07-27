@@ -1,18 +1,21 @@
 using System.Media;
 using System.Windows.Media;
-
+using System;
 public abstract class ShopBtn 
 {
     public Sprite btnSprite { get; set; }
     public int cost { get; set; }
     public int x { get; set; }
     public int y { get; set; }
+    public DateTime lastPurchase { get; set; } = DateTime.Now;
+    public int buyingDelay { get; set; } = 1500;
     public virtual void Buy()
     {
-        if (Game.Current.player.money >= this.cost)
+        if (Game.Current.player.money >= this.cost && (DateTime.Now - lastPurchase).TotalMilliseconds >= buyingDelay)
         {
             Game.Current.player.money -= this.cost;
             GetBtnUpgrade();
+            lastPurchase = DateTime.Now;
         }
     } 
     public abstract void GetBtnUpgrade();
@@ -28,7 +31,11 @@ public class UpgradePcBtn : ShopBtn
         this.y = 400;
     }
 
-    public override void GetBtnUpgrade() => Game.Current.loading.animationLenght /= 2;
+    public override void GetBtnUpgrade()
+    {
+        this.cost += (int)(this.cost/2);
+        Game.Current.pcLoading /= 2;
+    }
 }
 public class UpgradeMonitorBtn : ShopBtn
 {
@@ -59,10 +66,11 @@ public class BuyCourseBtn : ShopBtn
 
     public override void Buy()
     {
-        if (Game.Current.player.money >= this.cost && Game.Current.player.lv < 3)
+        if (Game.Current.player.money >= this.cost && Game.Current.player.lv < 3 && (DateTime.Now - lastPurchase).TotalMilliseconds >= buyingDelay)
         {
             Game.Current.player.money -= this.cost;
             GetBtnUpgrade();
+            lastPurchase = DateTime.Now;
         }
     } 
 
@@ -103,10 +111,11 @@ public class RepairPcBtn : ShopBtn
     }
     public override void Buy()
     {
-        if (Game.Current.player.money >= this.cost && Game.Current.pcHealth.healthLimit > Game.Current.pcHealth.health)
+        if (Game.Current.player.money >= this.cost && Game.Current.pcHealth.healthLimit > Game.Current.pcHealth.health && (DateTime.Now - lastPurchase).TotalMilliseconds >= buyingDelay)
         {
             Game.Current.player.money -= this.cost;
             GetBtnUpgrade();
+            lastPurchase = DateTime.Now;
         }
     } 
 
@@ -151,7 +160,6 @@ public class BuyCinemaTicket : ShopBtn
     } 
     public override void GetBtnUpgrade() => Game.Current.player.relaxed = true;
 }
-
 public class HuntBtn : ShopBtn
 {
     public HuntBtn()
